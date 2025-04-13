@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV - Ayoub Bouchen</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2A5C82;
+            --secondary-color: #3AB0FF;
+            --accent-color: #FFB72B;
+            --dark-color: #1A2A3A;
+            --light-color: #F8F9FA;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--light-color);
+            margin: 0;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+
+        .pdf-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .pdf-toolbar {
+            background: var(--primary-color);
+            padding: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .toolbar-button {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toolbar-button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .page-counter {
+            color: white;
+            margin-left: auto;
+        }
+
+        #pdf-viewer {
+            width: 100%;
+            min-height: 90vh;
+            position: relative;
+            background: #f5f5f5;
+            overflow-x: auto;
+        }
+
+        .pdf-page {
+            margin: 2rem auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: white;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .download-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent-color);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 5px 20px rgba(255,183,43,0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .home-btn {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            background: var(--dark-color);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+        canvas {
+            max-width: 95% !important;
+            height: auto !important;
+            margin: 20px auto;
+            display: block;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="pdf-container">
+        <div class="pdf-toolbar">
+            <button class="toolbar-button" onclick="previousPage()">
+                <i class="fas fa-chevron-left"></i> Précédent
+            </button>
+            <button class="toolbar-button" onclick="nextPage()">
+                Suivant <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="page-counter" id="page-counter">Page 1/4</span>
+        </div>
+
+        <div id="pdf-viewer">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner"></i>
+            </div>
+        </div>
+    </div>
+
+    <a href="2025_CV_AOUCHEN_SynthDetail.pdf" download class="download-btn">
+        <i class="fas fa-download"></i> Télécharger
+    </a>
+
+
+    <a href="index.html" class="home-btn">
+        <i class="fas fa-home"></i> Accueil
+    </a>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+
+    <script>
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        let currentPage = 1;
+        let pdfDoc = null;
+        const scale = 1.2;
+        function calculateScale() {
+            return window.innerWidth < 768 ? 1.0 : 1.2;
+        }
+
+        pdfjsLib.getDocument('2025_CV_AOUCHEN_SynthDetail.pdf').promise.then(pdf => {
+            pdfDoc = pdf;
+            renderPage(currentPage);
+            document.querySelector('.loading-spinner').style.display = 'none';
+        });
+
+
+        async function renderPage(num) {
+            const page = await pdfDoc.getPage(num);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+
+            await page.render(renderContext).promise;
+            document.getElementById('pdf-viewer').appendChild(canvas);
+            updatePageCounter();
+        }
+
+        function updatePageCounter() {
+            document.getElementById('page-counter').textContent = 
+                `Page ${currentPage}/${pdfDoc.numPages}`;
+        }
+
+        function nextPage() {
+            if (currentPage >= pdfDoc.numPages) return;
+            currentPage++;
+            document.getElementById('pdf-viewer').innerHTML = '';
+            renderPage(currentPage);
+        }
+
+        function previousPage() {
+            if (currentPage <= 1) return;
+            currentPage--;
+            document.getElementById('pdf-viewer').innerHTML = '';
+            renderPage(currentPage);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') previousPage();
+            if (e.key === 'ArrowRight') nextPage();
+        });
+    </script>
+</body>
+</html>

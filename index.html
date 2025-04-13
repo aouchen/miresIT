@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIRES - Expertise Informatique Professionnelle</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2A5C82;
+            --secondary-color: #3AB0FF;
+            --accent-color: #FFB72B;
+            --dark-color: #1A2A3A;
+            --light-color: #F8F9FA;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+        }
+
+        /* Slider amélioré */
+        .slider {
+            height: 90vh;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 5px solid var(--primary-color);
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: 1s opacity ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, rgba(26,42,58,0.9) 0%, rgba(42,92,130,0.7) 100%);
+        }
+
+        .slide-content {
+            position: relative;
+            z-index: 1;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide-content .logo {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .slide-content h2 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .slide-content p {
+            font-size: 1.4rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 5rem 2rem;
+            background: white;
+        }
+
+        .services-title {
+            text-align: center;
+            font-size: 2.8rem;
+            margin-bottom: 3rem;
+            position: relative;
+            color: var(--primary-color);
+        }
+
+        .services-title::after {
+            content: '';
+            width: 80px;
+            height: 4px;
+            background: var(--secondary-color);
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        }
+
+        .service-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .service-card i {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            min-width: 40px;
+        }
+
+        .service-card ul {
+            list-style: none;
+        }
+
+        .service-card li {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+            line-height: 1.4;
+        }
+
+        .service-card li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: var(--secondary-color);
+            font-weight: 700;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 5rem 2rem;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 2rem auto 0;
+        }
+
+        .contact-item {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        .contact-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .contact-item i {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-item h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-item p {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .slide-content .logo {
+                font-size: 2.5rem;
+            }
+
+            .slide-content h2 {
+                font-size: 2rem;
+            }
+
+            .slide-content p {
+                font-size: 1.1rem;
+            }
+
+            .services-title {
+                font-size: 2.2rem;
+            }
+
+            .service-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+
+
+    .cv-section {
+        padding: 4rem 2rem;
+        background: var(--light-color);
+        text-align: center;
+    }
+
+    .cv-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.2rem 2.5rem;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(42,92,130,0.3);
+        margin-top: 2rem;
+    }
+
+    .cv-button i {
+        font-size: 1.2rem;
+    }
+
+    .cv-button:hover {
+        background: var(--secondary-color);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(58,176,255,0.4);
+    }
+
+    </style>
+</head>
+<body>
+    <!-- Slider Section -->
+    <div class="slider">
+        <div class="slide active" style="background-image: url('images/1.webp')">
+            <div class="slide-content">
+                <div class="logo">MIRES</div>
+                <h2>Solutions Informatiques Professionnelles</h2>
+                <p>Expertise technique et accompagnement personnalisé</p>
+            </div>
+        </div>
+        <!-- Other slides... -->
+    </div>
+
+    <!-- Services Section -->
+    <section class="services">
+        <h2 class="services-title animate">Nos Services</h2>
+        <div class="services-grid">
+            <div class="service-card animate delay-1">
+                <h3><i class="fas fa-server"></i>Systèmes Informatiques</h3>
+                <ul>
+                    <li>Infrastructure cloud hybride</li>
+                    <li>Virtualisation avancée</li>
+                    <li>Monitoring 24/7</li>
+                    <li>Plan de reprise d'activité</li>
+                </ul>
+            </div>
+            <!-- Other service cards... -->
+
+
+            <div class="service-card">
+                <h3><i class="fas fa-network-wired"></i>Réseaux</h3>
+                <ul>
+                    <li>Conception et déploiement de solutions réseau</li>
+                    <li>Réseaux sans fil sécurisés</li>
+                    <li>Points d'accès avancés</li>
+                    <li>Surveillance continue des équipements</li>
+                </ul>
+            </div>
+
+            <!-- Security Services -->
+            <div class="service-card">
+                <h3><i class="fas fa-shield-alt"></i>Sécurité Informatique</h3>
+                <ul>
+                    <li>Détection des vulnérabilités</li>
+                    <li>Solutions de cybersécurité intégrées</li>
+                    <li>Formation des utilisateurs aux bonnes pratiques</li>
+                </ul>
+            </div>
+
+            <!-- Hardware Services -->
+            <div class="service-card">
+                <h3><i class="fas fa-shopping-cart"></i>Vente d'Équipements</h3>
+                <ul>
+                    <li>Fourniture d'équipements informatiques</li>
+                    <li>Solutions personnalisées selon les besoins</li>
+                    <li>Assistance dans le choix des équipements</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="cv-section animate">
+        <div class="services-title">Profil Professionnel</div>
+        <a href="2025_CV_AOUCHEN_SynthDetail.html" class="cv-button">
+            <i class="fas fa-file-pdf"></i>
+            Voir le CV Complet
+        </a>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <div class="contact-grid">
+            <div class="contact-item animate">
+                <i class="fas fa-phone"></i>
+                <h3>Téléphone</h3>
+                <p>+212-705800567</p>
+            </div>
+            <!-- Other contact items... -->
+
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <h3>Email</h3>
+                <p>ayoubouchen.it@gmail.com</p>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <h3>Adresse</h3>
+                <p>Rue iben khaldoun,<br>90000 Tanger</p>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        // Intersection Observer pour les animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate').forEach(el => observer.observe(el));
+
+        // Slider amélioré avec effet de fondu
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+        setInterval(nextSlide, 6000);
+    </script>
+</body>
+</html>
