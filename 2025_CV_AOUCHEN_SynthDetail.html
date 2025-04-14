@@ -105,21 +105,7 @@
             gap: 0.5rem;
         }
 
-        .home-btn {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            background: var(--dark-color);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            z-index: 1000;
-        }
+
         canvas {
             max-width: 95% !important;
             height: auto !important;
@@ -127,9 +113,80 @@
             display: block;
         }
 
+
+             
+        .home-button {
+            width:200px;
+            top: 1rem;
+            left: 1rem;
+            background: var(--primary-color);
+            color: white !important;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            box-shadow: 0 3px 15px rgba(42,92,130,0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+    
+        .home-button:hover {
+            transform: translateY(-2px);
+            background: var(--secondary-color);
+        }
+
+
+    .preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.98);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.5s ease;
+    }
+
+    .loader-logo {
+        width: 150px;
+        height: 150px;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    /* إخفاء العناصر الأخرى */
+    .loader-inner,
+    .loading-spinner {
+        display: none !important;
+    }
+
+
+
+
     </style>
 </head>
 <body>
+
+
+
+    <a href="index.html" class="home-button">
+        <i class="fas fa-arrow-left"></i>
+        Retour à l'accueil
+    </a>
+
+
+
+
+
     <div class="pdf-container">
         <div class="pdf-toolbar">
             <button class="toolbar-button" onclick="previousPage()">
@@ -148,52 +205,101 @@
         </div>
     </div>
 
+
+    <div class="preloader">
+        <div class="loader">
+            <div class="loader-inner"></div>
+            <img src="images/Book.gif" class="loader-logo" alt="MIRES Logo">
+        </div>
+    </div>
+
     <a href="2025_CV_AOUCHEN_SynthDetail.pdf" download class="download-btn">
         <i class="fas fa-download"></i> Télécharger
     </a>
 
 
-    <a href="index.html" class="home-btn">
-        <i class="fas fa-home"></i> Accueil
-    </a>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-
     <script>
+        window.addEventListener('load', () => {
+            const preloader = document.querySelector('.preloader');
+            preloader.style.opacity = '0';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500);
+        });
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
         let currentPage = 1;
         let pdfDoc = null;
         const scale = 1.2;
+        let isPdfLoaded = false;
+
+
+
         function calculateScale() {
             return window.innerWidth < 768 ? 1.0 : 1.2;
         }
 
-        pdfjsLib.getDocument('2025_CV_AOUCHEN_SynthDetail.pdf').promise.then(pdf => {
-            pdfDoc = pdf;
-            renderPage(currentPage);
-            document.querySelector('.loading-spinner').style.display = 'none';
-        });
 
-
-        async function renderPage(num) {
-            const page = await pdfDoc.getPage(num);
-            const viewport = page.getViewport({ scale: 1.5 });
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-
-            const renderContext = {
-                canvasContext: ctx,
-                viewport: viewport
-            };
-
-            await page.render(renderContext).promise;
-            document.getElementById('pdf-viewer').appendChild(canvas);
-            updatePageCounter();
+        // إدارة حالة التحميل
+        function checkLoadingStatus() {
+            const preloader = document.querySelector('.preloader');
+            if (isPdfLoaded) {
+                preloader.style.opacity = '0';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 500);
+            }
         }
+
+
+
+
+pdfjsLib.getDocument('2025_CV_AOUCHEN_SynthDetail.pdf').promise
+    .then(pdf => {
+        pdfDoc = pdf;
+        return renderPage(currentPage);
+    })
+    .then(() => {
+        isPdfLoaded = true;
+        checkLoadingStatus();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Erreur de chargement du fichier PDF');
+        document.querySelector('.preloader').style.display = 'none';
+    });
+
+
+async function renderPage(num) {
+    try {
+        const page = await pdfDoc.getPage(num);
+        const viewport = page.getViewport({ scale: 1.5 });
+        
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        canvas.width = viewport.width * devicePixelRatio;
+        canvas.height = viewport.height * devicePixelRatio;
+        canvas.style.width = viewport.width + 'px';
+        canvas.style.height = viewport.height + 'px';
+        
+        ctx.scale(devicePixelRatio, devicePixelRatio);
+
+        const renderContext = {
+            canvasContext: ctx,
+            viewport: viewport
+        };
+
+        await page.render(renderContext).promise;
+        document.getElementById('pdf-viewer').appendChild(canvas);
+        updatePageCounter();
+    } catch (error) {
+        console.error('Error rendering page:', error);
+        throw error;
+    }
+}
 
         function updatePageCounter() {
             document.getElementById('page-counter').textContent = 
@@ -221,3 +327,5 @@
     </script>
 </body>
 </html>
+
+
